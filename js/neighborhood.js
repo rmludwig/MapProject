@@ -68,6 +68,7 @@ var LocationData = [
 
 
 /* MODEL */
+/* Location Object*/
 var Location = function(data) {
     // Attributes OR observables
     this.name = data.name;
@@ -76,6 +77,10 @@ var Location = function(data) {
     this.id = data.id;
     this.visible = ko.observable(data.visible);
 };
+/* Search Object*/
+var Search = function(argument) {
+    this.criteria = ko.observable(argument.criteria);
+}
 
 
 /* VIEWMODEL - aka Controller */
@@ -88,16 +93,18 @@ var ViewModel = function() {
     var self = this;
 
     // Create observable array that will be pupulated with model data
-    self.locationList = ko.observableArray([]);
-
-    // Create observable for the map
-    self.map = ko.observable({});
-   
+    self.locationList = ko.observableArray([]);  
 
     // Populate the ObsAarray with loc data via loop
     LocationData.forEach(function(item) {
         self.locationList.push( new Location(item) )
     });
+
+    // Create Search observable
+    self.search = ko.observable( new Search(" ") );
+
+    // Create observable for the map
+    self.map = ko.observable({});
 
     // Setup the map and components
     function initialize() {
@@ -119,7 +126,7 @@ var ViewModel = function() {
         loadOverlay();
 
         // Position the controls where I want them using google API
-        var input = (document.getElementById('pac-input'));
+        var input = document.getElementById('pac-input');
         var types = document.getElementById('type-selector');
         self.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
         self.map.controls[google.maps.ControlPosition.TOP_LEFT].push(types);
@@ -135,7 +142,7 @@ var ViewModel = function() {
         for (var i = 0; i < self.locationList().length; i++) { 
 
             // Only load the visible markers
-            console.log("The "+self.locationList()[i].name+" visibility is "+self.locationList()[i].visible());
+            //console.log("The "+self.locationList()[i].name+" visibility is "+self.locationList()[i].visible());
             if (self.locationList()[i].visible()) {
                 marker = new google.maps.Marker({
                     position: new google.maps.LatLng(self.locationList()[i].lat, self.locationList()[i].lng),
