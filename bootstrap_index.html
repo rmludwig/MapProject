@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PAGE TITLE</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:100,300,400' rel='stylesheet' type='text/css'></link>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <!-- Considder reducing bootstrap size with a custom theme -->
+    <link href="css/style.css" rel="stylesheet" type="text/css"></link>
+    <style>
+        body {
+            background-color: #AAAAAA;
+        }
+        /* Add CSS here when possible */
+    </style>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center text-uppercase">
+                <h1>Example Using Bootstrap</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 text-left">
+                <h3>Update HTML As needed</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <h3>Right Side</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <img class="img-responsive center-block" src="image/flower.PNG" alt="flower image" data-toggle="modal" data-target="#modal1" />
+                <h2 class="text-uppercase">Click For Modal</h2>
+                <a href="#" class="white">Link To this site.</a>
+            </div>
+            <div class="col-md-4 my_outer_div_bs">
+                <h4> Outer div </h4>
+                <p>Some paragraph text.</p>
+                <div class='my_inner_div_bs'>
+                    Inner div 
+                </div>
+                <p class="small-text">The image elements have modal pop-ups. Also this page is resizable to various screen sizes and for mobile. Bootstrap can be customized to reduce the file sizes. Go to Bootstap home page for info.
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <img class="img-responsive center-block" src="image/flower.PNG" alt="flower image" data-toggle="modal" data-target="#modal2" />
+                <h2 class="text-uppercase">Click For Modal</h2>
+                <a href="#" class="white">Link To this site.</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="text-uppercase">Resizable Kitty</h2>
+                <img class="img-responsive center-block" src="image/main.jpg" alt="kitty" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 1 -->
+    <div class="modal fade" id="modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Flower Modal Pop-up</h4>
+                </div>
+                <div class="modal-body">
+                    <img class="img-responsive" src="image/flower.PNG" />
+                    This is a simple modal popup example for this flower.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2 -->
+    <div class="modal fade" id="modal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myModalLabel">Flower Modal Pop-up NUMBER 2</h4>
+                </div>
+                <div class="modal-body">
+                    <img class="img-responsive" src="image/flower.PNG" />
+                    This is the second modal pop-up window. Add as much here as you want.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // When needed add inner html (inside dom creation) scripting here
+    </script>
+</body>
+</html>
+
+<script>
+    // When needed add post html scripting here 
+</script>

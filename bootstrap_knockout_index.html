@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PAGE TITLE</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:100,300,400' rel='stylesheet' type='text/css'></link>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+    <!-- Considder reducing bootstrap size with a custom theme -->
+    <link href="css/style.css" rel="stylesheet" type="text/css"></link>
+    <style>
+        body {
+            background-color: #BBBBBB;
+        }
+        /* Add CSS here when possible */
+    </style>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 text-center text-uppercase">
+                <h1>Example Using Bootstrap and Knockout</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 text-left">
+                <h3>Update HTML As needed</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <h3>Right Side</h3>
+            </div>
+        </div>
+        <div class="row" id="oneThirdContainer" data-bind="foreach: componentList">
+            <div class="col-md-4 text-center">
+                <img class="img-responsive center-block" data-bind="attr: {src: imgSrc, 'data-target': modalName}" data-toggle="modal" />
+                <h2 class="text-uppercase" data-bind="text: title"></h2>
+                <p><span data-bind="text: comment"></span></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <ul data-bind="foreach: componentList">
+                    <li>
+                        <h2 data-bind="text: title"></h2>
+                        <p>Comment: <input data-bind="value: comment, valueUpdate='afterkeydown'" /></p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2 class="text-uppercase">Resizable Kitty</h2>
+                <img class="img-responsive center-block" src="image/main.jpg" alt="kitty" />
+            </div>
+        </div>
+    </div>
+
+    <div id="modalContainer" data-bind="foreach: componentList">
+        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-bind="attr: {id: id}">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" data-bind="text: title"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <img src="" alt="cute cat" class="img-responsive" data-bind="attr: {src: imgSrc}">
+                        <h3><span data-bind="text: message"></h3>
+                        <p>Comment: <span data-bind="text: comment"></span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add JS library and app specific JS after body -->
+    <script src="js/lib/knockout-3.2.0.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
+
+<script>
+    // When needed add post html scripting here 
+</script>
