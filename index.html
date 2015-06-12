@@ -66,8 +66,8 @@
 </head>
 
 <body>
-    <input id="pac-input" class="controls" type="text"
-        placeholder="Search Rich's Locations" data-bind="with: search, value: criteria, valueUpdate='afterkeydown'">
+    <input id="pac-input" class="controls" data-bind="textInput: criteria"
+        placeholder="Search Rich's Locations" />
     <div id="type-selector" class="controls">
       <input type="radio" name="type" id="changetype-all" checked="checked">
       <label for="changetype-all">All</label>
