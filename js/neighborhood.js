@@ -15,7 +15,7 @@ var LocationData = [
         lat : 38.7464160,
         lng : -90.5763050,
         id : 2,
-        visible : false,
+        visible : true,
         latLng : "",
         marker : ""
     },
@@ -114,16 +114,7 @@ var ViewModel = function() {
     // Populate the ObsAarray with loc data via loop
     LocationData.forEach(function(item) {
         self.locationList.push( new Location(item) );
-
-        // Observable is in my AbsArrray. How to detect updates?
-        // There must be a better way, but I'm 6 hours in so...
-        //var listIdForItem = item.id - 1;
-        //self.locationList()[listIdForItem].visible.subscribe( (function(itemId) {
-        //    newVisibility(itemId);
-        //})(listIdForItem));
-
     });
-
 
     // Create search criteria observable
     self.criteria = ko.observable();
@@ -133,33 +124,20 @@ var ViewModel = function() {
         // For each location matching criteria make visible
         ko.utils.arrayForEach(self.locationList(), function(item) {
             if (item.name.toLowerCase().match(criteria.toLowerCase())) {
-                console.log("--------> Found "+item.name);
+                //console.log("--------> Found "+item.name);
                 item.marker.setMap(self.map);
-                //item.visible(true);
+                item.visible(true);
             }
             else {
-                console.log("NOT FOUND "+item.name);
+                //console.log("NOT FOUND "+item.name);
                 item.marker.setMap(null);
-                //item.visible(false);
+                item.visible(false);
             }
         });
         //ko.utils.arrayForEach(self.locationList(), function(item) {
             //console.log(item.name+" "+item.visible());
         //});
     });
-
-
-/*
-    // Modify marker based on location visibility
-    function newVisibility(itemId) {
-        // Set visibility
-        //console.log("did it");
-        console.log("ID = "+itemId);
-        //console.log(self.locationList()[itemId].name);
-        //this.visible(newValue);
-    };
-*/
-
 
     // Create observable for the map and infowindow
     self.map = ko.observable();
@@ -169,12 +147,13 @@ var ViewModel = function() {
     function initialize() {
         console.log("Loading map")
 
+        // Attributes of my map, basis of the webpage
         var mapOptions = {
             center : {
                 lat : self.locationList()[0].lat,
                 lng : self.locationList()[0].lng
             },
-            zoom: 14,
+            zoom: 15,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         
@@ -219,61 +198,35 @@ var ViewModel = function() {
         };
     };
 
-    // Removes the markers from the map, but keeps them in the array.
-    function clearMarkers() {
-        setAllMap(null);
-    };
-
-    // Shows any markers currently in the array.
-    function showMarkers() {
-        setAllMap(self.map);
-    };
-
-/*
-    // Create info window for overlay elements
-    function loadOverlay(currentList) {
-        // Clear content first.
-        self.iWindow = new google.maps.InfoWindow({
-            content: 'loading'
+    function changeAllVisibility(newVisibility) {
+        ko.utils.arrayForEach(self.locationList(), function(item) {
+                self.criteria('');
+                if (newVisibility) {
+                    item.marker.setMap(self.map);
+                }
+                else {
+                    item.marker.setMap(null);
+                }
+                item.visible(newVisibility);
         });
+    }
 
-        // For each location build an initial marker using visibility attribute
-        var marker;
-        for (var i = 0; i < currentList.length; i++) { 
+    // Makes all markers hidden, resets search input, and makes 
+    // ONLY the selected marker visible
+    self.selectItemFromList = function(item) {
+        changeAllVisibility(false);
+        item.marker.setMap(self.map);
+        item.visible(true);
+    }
 
-            // Only load the visible markers
-            //console.log("The "+self.locationList()[i].name+" visibility is "+self.locationList()[i].visible());
-            if (currentList[i].visible()) {
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(currentList[i].lat, currentList[i].lng),
-                    map: self.map
-                });
-
-                google.maps.event.addListener(marker, 'click', (function(thisMarker, i) {
-                    return function() {
-                        self.iWindow.setContent(currentList[i].name);
-                        self.iWindow.open(self.map, thisMarker);
-                    }
-                })(marker, i));
-            }
-        };
-    };
-
-*/
-
-
-    // Search my locations, and re-draw the markers.
-
-    // Build list of all markers.
+    // Makes all markers visible and resets search input
+    self.makeAllVisible = function() {
+        changeAllVisibility(true);
+    }
     
-    // On instatiation of VM initialize
+    // On instatiation of VeiwMoeld initialize
     google.maps.event.addDomListener(window, 'load', initialize);
-
-    //console.log("This guy "+self.locationList()[0].name);
-    //console.log(+self.locationList()[0].marker.visible());
-    //self.locationList()[0].marker.setVisible(false);
 };
-
 
 // Pull ViewModel and Model data specifics into KO for 
 // interaction. Bind my view and model.
