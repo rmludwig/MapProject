@@ -7,7 +7,8 @@ var LocationData = [
         lng : -90.5884440,
         id : 1,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Shop N Save',
@@ -15,7 +16,8 @@ var LocationData = [
         lng : -90.5763050,
         id : 2,
         visible : false,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Jim\'s House',
@@ -23,7 +25,8 @@ var LocationData = [
         lng : -90.5909640,
         id : 3,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Grade School',
@@ -31,7 +34,8 @@ var LocationData = [
         lng : -90.5983220,
         id : 4,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Bus Stop',
@@ -39,7 +43,8 @@ var LocationData = [
         lng : -90.5882060,
         id : 5,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Pretzel Stop',
@@ -47,7 +52,8 @@ var LocationData = [
         lng : -90.5922510,
         id : 6,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Shell Gas Station',
@@ -55,7 +61,8 @@ var LocationData = [
         lng : -90.5810290,
         id : 7,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Dog Walk Turnaround',
@@ -63,7 +70,8 @@ var LocationData = [
         lng : -90.5796640,
         id : 8,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     },
     {
         name : 'Zion Church',
@@ -71,7 +79,8 @@ var LocationData = [
         lng : -90.5843770,
         id : 9,
         visible : true,
-        latLng : ""
+        latLng : "",
+        marker : ""
     }
 ]; 
 
@@ -85,7 +94,8 @@ var Location = function(data) {
     this.lng = data.lng;
     this.id = data.id;
     this.visible = ko.observable(data.visible);
-    this.latLng = data.latLng
+    this.latLng = data.latLng;
+    this.marker = data.marker;
 };
 
 
@@ -107,10 +117,10 @@ var ViewModel = function() {
 
         // Observable is in my AbsArrray. How to detect updates?
         // There must be a better way, but I'm 6 hours in so...
-        var listIdForItem = item.id - 1;
-        self.locationList()[listIdForItem].visible.subscribe( (function(itemId) {
-            newVisibility(itemId);
-        })(listIdForItem));
+        //var listIdForItem = item.id - 1;
+        //self.locationList()[listIdForItem].visible.subscribe( (function(itemId) {
+        //    newVisibility(itemId);
+        //})(listIdForItem));
 
     });
 
@@ -123,21 +133,23 @@ var ViewModel = function() {
         // For each location matching criteria make visible
         ko.utils.arrayForEach(self.locationList(), function(item) {
             if (item.name.toLowerCase().match(criteria.toLowerCase())) {
-                //console.log("--------> Found "+item.name);
-                item.visible(true);
+                console.log("--------> Found "+item.name);
+                item.marker.setMap(self.map);
+                //item.visible(true);
             }
             else {
-                //console.log("NOT FOUND "+item.name);
-                item.visible(false);
+                console.log("NOT FOUND "+item.name);
+                item.marker.setMap(null);
+                //item.visible(false);
             }
         });
-        ko.utils.arrayForEach(self.locationList(), function(item) {
+        //ko.utils.arrayForEach(self.locationList(), function(item) {
             //console.log(item.name+" "+item.visible());
-        });
+        //});
     });
 
 
-
+/*
     // Modify marker based on location visibility
     function newVisibility(itemId) {
         // Set visibility
@@ -146,7 +158,7 @@ var ViewModel = function() {
         //console.log(self.locationList()[itemId].name);
         //this.visible(newValue);
     };
-
+*/
 
 
     // Create observable for the map and infowindow
@@ -162,7 +174,7 @@ var ViewModel = function() {
                 lat : self.locationList()[0].lat,
                 lng : self.locationList()[0].lng
             },
-            zoom: 15,
+            zoom: 14,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
         
@@ -186,26 +198,35 @@ var ViewModel = function() {
     // Create info window for overlay elements
     function loadOverlay() {
         // For each location build an initial marker using visibility attribute
-        var marker;
         for (var i = 0; i < self.locationList().length; i++) { 
 
             // Create latLng then set to the array attribute on locations
             var position = new google.maps.LatLng(self.locationList()[i].lat, self.locationList()[i].lng)
             self.locationList()[i].latLng = position;
 
-            marker = new google.maps.Marker({
+            self.locationList()[i].marker = new google.maps.Marker({
                 position: position,
                 map: self.map
             });
 
-            google.maps.event.addListener(marker, 'click', (function(thisMarker, i) {
+            google.maps.event.addListener(self.locationList()[i].marker, 'click', (function(thisMarker, i) {
                 return function() {
                     self.iWindow.setContent(self.locationList()[i].name);
                     self.iWindow.open(self.map, thisMarker);
                 }
-            })(marker, i));
+            })(self.locationList()[i].marker, i));
 
         };
+    };
+
+    // Removes the markers from the map, but keeps them in the array.
+    function clearMarkers() {
+        setAllMap(null);
+    };
+
+    // Shows any markers currently in the array.
+    function showMarkers() {
+        setAllMap(self.map);
     };
 
 /*
