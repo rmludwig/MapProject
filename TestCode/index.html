@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Rich's Neighborhood</title>
+    <!-- Moved all CSS into index to marginally speed DOM creation, Could minify later -->
+    <!-- <link href="css/style.css" rel="stylesheet" type="text/css"></link> -->
+    <style>
+        body {
+            background-color: #EEEEEE;
+            font-family: sans-serif, Arial, Helvetica, sans-serif;
+        }
+        html, body, #map-canvas {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .controls {
+            margin-top: 25px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        #pac-input {
+            background-color: #fff;
+            font-family: Roboto;
+            font-size: 15px;
+            font-weight: 300;
+            margin-left: 5px;
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 230px;
+        }
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
+        .pac-container {
+            font-family: Roboto;
+        }
+        #location-list {
+            background-color: #4d90fe;
+            opacity: 0.7;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            margin-bottom: 50px;
+            padding-top: 15px;
+            width: 230px;
+            z-index: 10;
+            font-size: 16px;
+            font-weight: bold;
+            
+        }
+        .location-item, .location-item a, .all-visible a {
+            color: #000000;
+            list-style-type: disc;
+            opacity: 1;
+            z-index: 11;
+            text-decoration: none;
+        }
+        .location-item a:link, .location-item a:visited, .all-visible a:link, .all-visible a:visited {
+            color: #000000;
+        }
+        .location-item a:hover, .location-item a:active, .all-visible a:hover, .all-visible a:active {
+            color: #FF0000;
+        }
+        .all-visible {
+            margin-top: 30px;
+            font-weight: bolder;
+            padding-left: 15px;
+        }
+        .flickr-image {
+            max-width: 100px;
+            max-height: 100px;
+        }
+        .flickr-link {
+            text-decoration: none;
+        }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtooKMrbs_gvtGXsqx_1zTJNCoyYD8XtU">
+    </script>
+</head>
+
+<body>
+    <input id="pac-input" class="controls" data-bind="textInput: criteria"
+        placeholder="Search Rich's Location Names" />
+    <div id="location-list">
+      <span class="all-visible"><a href="#" data-bind="click: makeAllVisible">SHOW ALL LOCATIONS</a></span>
+      <ul data-bind="foreach: locationList">
+        <span data-bind="if: visible">
+            <li class="location-item"><a href="#" data-bind="text: name, click: $parent.selectItemFromList"></a></li>
+        </span>
+      </ul>
+    </div>
+
+    <div id="map-canvas"></div>
+    
+    <!-- Add JS library and app specific JS after body -->
+    <script src="js/lib/knockout-3.2.0.js"></script>
+    <script src="js/lib/jquery.min.js"></script>
+    <script src="js/neighborhood.js"></script>
+</body>
+</html>
