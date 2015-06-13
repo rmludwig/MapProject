@@ -10,7 +10,7 @@ var LocationData = [
         visible : true,
         latLng : "",
         marker : "",
-        searchString : "home family"
+        searchString : "home"
     },
     {
         name : 'Shop N Save',
@@ -25,7 +25,7 @@ var LocationData = [
     },
     {
         name : 'Jim\'s House',
-        desc : 'Where Rich plays poker with the guys on Thurseday nights.',
+        desc : 'Where Rich plays poker with the guys on Thursday nights.',
         lat : 38.7304430,
         lng : -90.5909640,
         id : 3,
@@ -47,7 +47,7 @@ var LocationData = [
     },
     {
         name : 'Bus Stop',
-        desc : 'Where the kids catch the bus ride to get to grade school.',
+        desc : 'Where the kids catch the bus to get to grade school.',
         lat : 38.7347680,
         lng : -90.5882060,
         id : 5,
@@ -104,7 +104,6 @@ var LocationData = [
 
 
 /* MODEL */
-/* Location Object*/
 var Location = function(data) {
     // Attributes OR observables
     this.name = data.name;
@@ -136,7 +135,7 @@ var ViewModel = function() {
         self.locationList.push( new Location(item) );
     });
 
-    // Create search criteria observable
+    // Create search criteria observable to trigger filtering of markers
     self.criteria = ko.observable();
 
     // Search function based on observable
@@ -144,19 +143,20 @@ var ViewModel = function() {
         // For each location matching criteria make visible
         ko.utils.arrayForEach(self.locationList(), function(item) {
             if (item.name.toLowerCase().match(criteria.toLowerCase())) {
-                //console.log("--------> Found "+item.name);
                 item.marker.setMap(self.map);
                 item.visible(true);
             }
             else {
-                //console.log("NOT FOUND "+item.name);
                 item.marker.setMap(null);
                 item.visible(false);
             }
         });
-        //ko.utils.arrayForEach(self.locationList(), function(item) {
-            //console.log(item.name+" "+item.visible());
-        //});
+        /* Uncomment for debugging */
+        /*
+        ko.utils.arrayForEach(self.locationList(), function(item) {
+            console.log(item.name+" "+item.visible());
+        });
+        */
     });
 
     // Create observable for the map and infowindow
@@ -165,7 +165,7 @@ var ViewModel = function() {
 
     // Setup the map and components
     function initialize() {
-        console.log("Loading map")
+        //console.log("Loading map")
 
         // Attributes of my map, basis of the webpage
         var mapOptions = {
@@ -194,7 +194,6 @@ var ViewModel = function() {
 
     };
 
-
     // Create info window for overlay elements
     function loadOverlay() {
         // For each location build an initial marker using visibility attribute
@@ -207,11 +206,13 @@ var ViewModel = function() {
             var position = new google.maps.LatLng(self.locationList()[i].lat, self.locationList()[i].lng)
             self.locationList()[i].latLng = position;
 
+            // Build marker object and add as attribute to location
             self.locationList()[i].marker = new google.maps.Marker({
                 position: position,
                 map: self.map
             });
 
+            // Add the click listener to trigger infowindow popup with extra data on a location
             google.maps.event.addListener(self.locationList()[i].marker, 'click', (function(thisMarker, i, content) {
                 return function() {
                     self.iWindow.setContent(content);
@@ -219,11 +220,14 @@ var ViewModel = function() {
                     fetchWikiInfo(self.locationList()[i]);
                     fetchFlickrInfo(self.locationList()[i]);
                     self.map.setCenter(thisMarker.getPosition());
+                    changeAllMarkerColor();
+                    thisMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'); //icon: iconBase + 'schools_maps.png'
                 }
             })(self.locationList()[i].marker, i, content));
         };
     };
 
+    // Change visibility of all markers
     function changeAllVisibility(newVisibility) {
         ko.utils.arrayForEach(self.locationList(), function(item) {
                 self.criteria('');
@@ -235,13 +239,18 @@ var ViewModel = function() {
                 }
                 item.visible(newVisibility);
         });
-    }
+    };
 
-    // Build location specific content container
+    // Change color of all markers
+    function changeAllMarkerColor() {
+        ko.utils.arrayForEach(self.locationList(), function(item) {
+            item.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+        });
+    };
+
+    // For the given location build location specific content container
     function buildMarkerPopContent(listItem) {
-        // create elements for the popup
-        var container;
-        container  = '<div class="popup-container">';
+        var container = '<div class="popup-container">';
         container += '<h2>'+listItem.name+'</h2>';
         container += '<p>'+listItem.desc+'</p>';
         container += '<h4>Wikipedia Links</h4>';
@@ -253,9 +262,9 @@ var ViewModel = function() {
         return container;
     }
 
-
+    // For the given location get collection of wiki links
     function fetchWikiInfo(listItem) {
-        // Get the element that I hope to modify via ajax
+        // Get the element that I will modify via ajax
         var wikiListUl = $('#wiki-list-'+listItem.id);
 
         // Make a timeout for uncought errors with JSONP callback to wiki
@@ -266,35 +275,43 @@ var ViewModel = function() {
 
         // set attributes for JSONP request with callback
         var wikiURL = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + listItem.searchString + '&format=json&callback=wikiCallback';
-        var ajaxSettings = {url: wikiURL,
-                            dataType: "jsonp",
-                            success: function(response) {
-                                        console.log("Wiki Callback");
-                                        console.log(response);
-                                        var articleList = response[1];
+        var ajaxSettings = {
+            url: wikiURL,
+            dataType: "jsonp",
+            success: function(response) {
+                //console.log("Wiki Callback");
+                //console.log(response);
+                var articleList = response[1];
                                         
-                                        for (var i = 0; i < articleList.length; i++) {
-                                            if (i == 4) {
-                                                clearTimeout(wikiRequestTimeout);
-                                                return false;
-                                            }
-                                            articleStr = articleList[i];
-                                            var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-                                            console.log(url);
-                                            wikiListUl.append('<li class="wiki-item"><a href="' + url + '">' + articleStr + '</a></li>');
-                                        };
+                for (var i = 0; i < articleList.length; i++) {
+                    if (i == 4) {
+                        clearTimeout(wikiRequestTimeout);
+                        return false;
+                    };
+                    var articleStr = articleList[i];
+                    var url = 'http://en.wikipedia.org/wiki/' + articleStr;
+                    //console.log(url);
+                    wikiListUl.append('<li class="wiki-item"><a href="' + url + '" target="_wikiWindow">' + articleStr + '</a></li>');
+                };
 
-                                        // Prevent timeout above from overwriting if success
-                                        clearTimeout(wikiRequestTimeout);
-                                     }
-                            };
+                // Warn users if no wiki pages were found
+                if (articleList.length == 0) {
+                    wikiListUl.append('<li class="wiki-item">No related Wikipedia links were found.</li>');
+                };
+
+                // Prevent timeout above from overwriting if success
+                clearTimeout(wikiRequestTimeout);
+            }
+        };
+        
+        // Make ajax request
         $.ajax(ajaxSettings)
         .error(function(error) {
             wikiListUl.append("<li>Wikipedia Links Couldn't Load!</li>");
         });
     };
 
-
+    // Make asyncronous call to get flickr image related to search criteria
     function fetchFlickrInfo(listItem) {
         // Get the element that I will pupulate with json result
         var flickrImg = $('#flickr-image-'+listItem.id);
@@ -305,54 +322,21 @@ var ViewModel = function() {
         // 8 second timeout
         }, 8000);
 
-        $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
-        {
-          tags: listItem.searchString,
-          tagmode: "any",
-          format: "json"
-        },
-        function(data) {
-          $.each(data.items, function(i,item){
-            flickrImg.attr("src", item.media.m);
-            flickrImg.parent().attr("href", item.media.m);
-            if ( i == 2 ) return false;
-          });
+        $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?", 
+            {
+                tags: listItem.searchString,
+                tagmode: "any",
+                format: "json"
+            },
+            function(data) {
+                // Use only the first item/image returned
+                flickrImg.attr("src", data.items[0].media.m);
+                flickrImg.parent().attr("href", data.items[0].media.m);
+
                 // Prevent timeout above from overwriting if success
                 clearTimeout(flickrRequestTimeout);
-        });
-
-/*
-        // set attributes for JSONP request with callback
-        var flickrURL = 'http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?'
-        var ajaxSettings = {url: flickrURL,
-                            dataType: "jsonp",
-                            success: function(response) {
-                                        console.log("Flickr Callback");
-                                        console.log(response);
-                                        //
-                                        //
-                                        //
-                                        var imageList = response[1];
-                                        for (var i = 0; i < 3; i++) {
-                                            articleStr = articleList[i];
-                                            var url = 'http://en.wikipedia.org/wiki/' + articleStr;
-                                            console.log(url);
-                                            wikiListUl.append('<li class="wiki-item"><a href="' + url + '">' + articleStr + '</a></li>');
-                                        };
-                                        //
-                                        //
-
-                                        // Prevent timeout above from overwriting if success
-                                        clearTimeout(flickrRequestTimeout);
-                                     }
-                            };
-        $.ajax(ajaxSettings)
-        .error(function(error) {
-            flickrImg.replaceWith("<div>Flickr content did not load!</div>";
-        });
-*/
-
-
+            }
+        );
     };
 
     // Makes all markers hidden, resets search input, and makes 
@@ -366,7 +350,12 @@ var ViewModel = function() {
 
     // Makes all markers visible and resets search input
     self.makeAllVisible = function() {
+        // show all markers
         changeAllVisibility(true);
+        // Reset to default color
+        changeAllMarkerColor();
+        // close any open infowindow
+        self.iWindow.close();
     };
     
     // On instatiation of VeiwMoeld initialize
@@ -376,31 +365,3 @@ var ViewModel = function() {
 // Pull ViewModel and Model data specifics into KO for 
 // interaction. Bind my view and model.
 ko.applyBindings(new ViewModel());
-
-
-
-
-/*
-
-
-        // USE LATER?? MAP BOUNDS
-        //38.7052978,-90.5186371 LR 
-        //38.7830861,-90.6475548 UL
-
-
-// This is needed when map is not in a stand alone div and full screen.
-// After I figured this out I re-read the requirements and see that full
-// screen is desired on this project. I'm leaving the code commented out
-// for future reference.
-function resizeGoogleMap() {
-    var mapDivWidth = $('#map-div').width();
-    $('#map-canvas').width(mapDivWidth);
-    $('#map-canvas').height(3 * mapDivWidth / 4);
-    google.maps.event.trigger($('#map'), 'resize');
-    console.log(mapDivWidth);
-    console.log("Resized");
-}
-
-// resize the map whenever the window resizes
-$(window).resize(resizeGoogleMap);
-*/
