@@ -14,7 +14,7 @@ var LocationData = [
     },
     {
         name : 'Shop N Save',
-        desc : 'The local super marker where Rich buys fresh avecados.',
+        desc : 'The local supermarket where Rich buys fresh avocados.',
         lat : 38.7464160,
         lng : -90.5763050,
         id : 2,
@@ -255,7 +255,7 @@ var ViewModel = function() {
         container += '<p>'+listItem.desc+'</p>';
         container += '<h4>Wikipedia Links</h4>';
         container += '<ul id="wiki-list-'+listItem.id+'" class="wiki-list"></ul>';
-        container += '<a href="" target="_flickr"><img id="flickr-image-'+listItem.id+'" class="flickr-image" alt="' + listItem.searchString + '"/></a>';
+        container += '<a class="flickr-link" href="" target="_flickr"><img id="flickr-image-'+listItem.id+'" class="flickr-image" alt="Loading image for ' + listItem.searchString + '"/></a>';
         container += '</div>';
         
         // return the string
@@ -270,8 +270,8 @@ var ViewModel = function() {
         // Make a timeout for uncought errors with JSONP callback to wiki
         var wikiRequestTimeout = setTimeout(function(){
             wikiListUl.append("<li>Failed to load Wikipedia links!</li>");
-        // 8 second timeout
-        }, 8000);
+        // 6 second timeout
+        }, 6000);
 
         // set attributes for JSONP request with callback
         var wikiURL = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + listItem.searchString + '&format=json&callback=wikiCallback';
@@ -359,7 +359,12 @@ var ViewModel = function() {
     };
     
     // On instatiation of VeiwMoeld initialize
-    google.maps.event.addDomListener(window, 'load', initialize);
+    if (typeof google !== "undefined") {
+        google.maps.event.addDomListener(window, 'load', initialize);
+    }
+    else {
+        $('#map-canvas').append("<strong><br>Google Map CONNECTION FAILED. Check your internet connection.<br></strong>");
+    }
 };
 
 // Pull ViewModel and Model data specifics into KO for 

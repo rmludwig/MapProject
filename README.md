@@ -2,8 +2,11 @@ Rich's Neighborhood Map project
 ===============================
 
 Date 06/13/15
+
 Author Rich L.
+
 Git repo https://github.com/rmludwig/MapProject.git
+
 
 Using the app
 -------------
