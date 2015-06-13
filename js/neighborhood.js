@@ -10,7 +10,7 @@ var LocationData = [
         visible : true,
         latLng : "",
         marker : "",
-        searchString : "home"
+        searchString : "home family"
     },
     {
         name : 'Shop N Save',
@@ -32,7 +32,7 @@ var LocationData = [
         visible : true,
         latLng : "",
         marker : "",
-        searchString : "poker game"
+        searchString : "card game"
     },
     {
         name : 'Grade School',
@@ -76,7 +76,7 @@ var LocationData = [
         visible : true,
         latLng : "",
         marker : "",
-        searchString : "gasoline"
+        searchString : "shell gasoline"
     },
     {
         name : 'Dog Walk Turnaround',
@@ -218,6 +218,7 @@ var ViewModel = function() {
                     self.iWindow.open(self.map, thisMarker);
                     fetchWikiInfo(self.locationList()[i]);
                     fetchFlickrInfo(self.locationList()[i]);
+                    self.map.setCenter(thisMarker.getPosition());
                 }
             })(self.locationList()[i].marker, i, content));
         };
@@ -240,12 +241,12 @@ var ViewModel = function() {
     function buildMarkerPopContent(listItem) {
         // create elements for the popup
         var container;
-        container += '<div class="popup-container">';
+        container  = '<div class="popup-container">';
         container += '<h2>'+listItem.name+'</h2>';
         container += '<p>'+listItem.desc+'</p>';
         container += '<h4>Wikipedia Links</h4>';
         container += '<ul id="wiki-list-'+listItem.id+'" class="wiki-list"></ul>';
-        container += '<img id="flickr-image-'+listItem.id+'" class="flickr-image" alt="' + listItem.searchString + '"/>';
+        container += '<a href="" target="_flickr"><img id="flickr-image-'+listItem.id+'" class="flickr-image" alt="' + listItem.searchString + '"/></a>';
         container += '</div>';
         
         // return the string
@@ -271,7 +272,12 @@ var ViewModel = function() {
                                         console.log("Wiki Callback");
                                         console.log(response);
                                         var articleList = response[1];
-                                        for (var i = 0; i < 3; i++) {
+                                        
+                                        for (var i = 0; i < articleList.length; i++) {
+                                            if (i == 4) {
+                                                clearTimeout(wikiRequestTimeout);
+                                                return false;
+                                            }
                                             articleStr = articleList[i];
                                             var url = 'http://en.wikipedia.org/wiki/' + articleStr;
                                             console.log(url);
@@ -295,7 +301,7 @@ var ViewModel = function() {
 
         // Make a timeout for uncought errors with JSONP callback to wiki
         var flickrRequestTimeout = setTimeout(function(){
-            flickrImg.replaceWith("<div>Failed to load Flickr image!</div>");
+            flickrImg.parent().replaceWith("<div>Failed to load Flickr image!</div>");
         // 8 second timeout
         }, 8000);
 
@@ -308,12 +314,11 @@ var ViewModel = function() {
         function(data) {
           $.each(data.items, function(i,item){
             flickrImg.attr("src", item.media.m);
+            flickrImg.parent().attr("href", item.media.m);
             if ( i == 2 ) return false;
           });
                 // Prevent timeout above from overwriting if success
                 clearTimeout(flickrRequestTimeout);
-
-
         });
 
 /*
@@ -356,6 +361,7 @@ var ViewModel = function() {
         changeAllVisibility(false);
         item.marker.setMap(self.map);
         item.visible(true);
+        google.maps.event.trigger(item.marker, 'click');
     };
 
     // Makes all markers visible and resets search input
