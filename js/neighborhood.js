@@ -8,9 +8,9 @@ var LocationData = [
         lng : -90.5884440,
         id : 1,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "home"
+        latLng : '',
+        marker : '',
+        searchString : 'home'
     },
     {
         name : 'Shop N Save',
@@ -19,9 +19,9 @@ var LocationData = [
         lng : -90.5763050,
         id : 2,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "grocery"
+        latLng : '',
+        marker : '',
+        searchString : 'grocery'
     },
     {
         name : 'Jim\'s House',
@@ -30,9 +30,9 @@ var LocationData = [
         lng : -90.5909640,
         id : 3,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "card game"
+        latLng : '',
+        marker : '',
+        searchString : 'card game'
     },
     {
         name : 'Grade School',
@@ -41,9 +41,9 @@ var LocationData = [
         lng : -90.5983220,
         id : 4,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "grade school"
+        latLng : '',
+        marker : '',
+        searchString : 'grade school'
     },
     {
         name : 'Bus Stop',
@@ -52,9 +52,9 @@ var LocationData = [
         lng : -90.5882060,
         id : 5,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "school bus"
+        latLng : '',
+        marker : '',
+        searchString : 'school bus'
     },
     {
         name : 'Pretzel Stop',
@@ -63,9 +63,9 @@ var LocationData = [
         lng : -90.5922510,
         id : 6,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "fresh pretzel"
+        latLng : '',
+        marker : '',
+        searchString : 'fresh pretzel'
     },
     {
         name : 'Shell Gas Station',
@@ -74,9 +74,9 @@ var LocationData = [
         lng : -90.5810290,
         id : 7,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "shell gasoline"
+        latLng : '',
+        marker : '',
+        searchString : 'shell gasoline'
     },
     {
         name : 'Dog Walk Turnaround',
@@ -85,9 +85,9 @@ var LocationData = [
         lng : -90.5796640,
         id : 8,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "puppy"
+        latLng : '',
+        marker : '',
+        searchString : 'puppy'
     },
     {
         name : 'Zion Church',
@@ -96,9 +96,9 @@ var LocationData = [
         lng : -90.5843770,
         id : 9,
         visible : true,
-        latLng : "",
-        marker : "",
-        searchString : "soccer"
+        latLng : '',
+        marker : '',
+        searchString : 'soccer'
     }
 ]; 
 
@@ -192,7 +192,24 @@ var ViewModel = function() {
         self.map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
         self.map.controls[google.maps.ControlPosition.TOP_LEFT].push(types);
 
-    };
+        // Resize and re-center map when window changes
+        google.maps.event.addDomListener(window, 'resize', function() {
+            var center = self.map.getCenter();
+            google.maps.event.trigger(self.map, 'resize');
+            self.map.setCenter(center);
+        });
+
+        // Resize and adjust the infowindow when window changes
+        google.maps.event.addDomListener(window, 'resize', function() {
+            self.iWindow.open(self.map);
+        });
+
+        // Detect infowindow close, and make location list visible again
+        google.maps.event.addListener(self.iWindow,'closeclick',function(){
+            $('#location-list').removeClass('location-list-hide');
+        });
+    }
+
 
     // Create info window for overlay elements
     function loadOverlay() {
@@ -203,7 +220,7 @@ var ViewModel = function() {
             var content = buildMarkerPopContent(self.locationList()[i]);
 
             // Create latLng then set to the array attribute on locations
-            var position = new google.maps.LatLng(self.locationList()[i].lat, self.locationList()[i].lng)
+            var position = new google.maps.LatLng(self.locationList()[i].lat, self.locationList()[i].lng);
             self.locationList()[i].latLng = position;
 
             // Build marker object and add as attribute to location
@@ -215,17 +232,22 @@ var ViewModel = function() {
             // Add the click listener to trigger infowindow popup with extra data on a location
             google.maps.event.addListener(self.locationList()[i].marker, 'click', (function(thisMarker, i, content) {
                 return function() {
+                    // Build infowindow
                     self.iWindow.setContent(content);
                     self.iWindow.open(self.map, thisMarker);
                     fetchWikiInfo(self.locationList()[i]);
                     fetchFlickrInfo(self.locationList()[i]);
                     self.map.setCenter(thisMarker.getPosition());
                     changeAllMarkerColor();
-                    thisMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png'); //icon: iconBase + 'schools_maps.png'
-                }
+                    thisMarker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
+                    // Hide the location list when infowindow is active
+                    // to make site more mobile friendly when space is
+                    // limited
+                    $('#location-list').addClass('location-list-hide');
+                };
             })(self.locationList()[i].marker, i, content));
-        };
-    };
+        }
+    }
 
     // Change visibility of all markers
     function changeAllVisibility(newVisibility) {
@@ -239,24 +261,22 @@ var ViewModel = function() {
                 }
                 item.visible(newVisibility);
         });
-    };
+    }
 
     // Change color of all markers
     function changeAllMarkerColor() {
         ko.utils.arrayForEach(self.locationList(), function(item) {
             item.marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
         });
-    };
+    }
 
     // For the given location build location specific content container
     function buildMarkerPopContent(listItem) {
-        var container = '<div class="popup-container">';
-        container += '<h2>'+listItem.name+'</h2>';
+        var container = '<h2>'+listItem.name+'</h2>';
         container += '<p>'+listItem.desc+'</p>';
         container += '<h4>Wikipedia Links</h4>';
         container += '<ul id="wiki-list-'+listItem.id+'" class="wiki-list"></ul>';
         container += '<a class="flickr-link" href="" target="_flickr"><img id="flickr-image-'+listItem.id+'" class="flickr-image" alt="Loading image for ' + listItem.searchString + '"/></a>';
-        container += '</div>';
         
         // return the string
         return container;
@@ -269,7 +289,7 @@ var ViewModel = function() {
 
         // Make a timeout for uncought errors with JSONP callback to wiki
         var wikiRequestTimeout = setTimeout(function(){
-            wikiListUl.append("<li>Failed to load Wikipedia links!</li>");
+            wikiListUl.append('<li>Failed to load Wikipedia links!</li>');
         // 6 second timeout
         }, 6000);
 
@@ -277,7 +297,7 @@ var ViewModel = function() {
         var wikiURL = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + listItem.searchString + '&format=json&callback=wikiCallback';
         var ajaxSettings = {
             url: wikiURL,
-            dataType: "jsonp",
+            dataType: 'jsonp',
             success: function(response) {
                 //console.log("Wiki Callback");
                 //console.log(response);
@@ -287,29 +307,31 @@ var ViewModel = function() {
                     if (i == 4) {
                         clearTimeout(wikiRequestTimeout);
                         return false;
-                    };
+                    }
                     var articleStr = articleList[i];
                     var url = 'http://en.wikipedia.org/wiki/' + articleStr;
                     //console.log(url);
                     wikiListUl.append('<li class="wiki-item"><a href="' + url + '" target="_wikiWindow">' + articleStr + '</a></li>');
-                };
+                }
 
                 // Warn users if no wiki pages were found
-                if (articleList.length == 0) {
+                if (articleList.length === 0) {
                     wikiListUl.append('<li class="wiki-item">No related Wikipedia links were found.</li>');
-                };
+                }
 
                 // Prevent timeout above from overwriting if success
                 clearTimeout(wikiRequestTimeout);
+                // Reposition window
+                self.iWindow.open(self.map);
             }
         };
         
         // Make ajax request
         $.ajax(ajaxSettings)
-        .error(function(error) {
-            wikiListUl.append("<li>Wikipedia Links Couldn't Load!</li>");
+        .error(function() {
+            wikiListUl.append('<li>Wikipedia Links Couldn\'t Load!</li>');
         });
-    };
+    }
 
     // Make asyncronous call to get flickr image related to search criteria
     function fetchFlickrInfo(listItem) {
@@ -318,26 +340,28 @@ var ViewModel = function() {
 
         // Make a timeout for uncought errors with JSONP callback to wiki
         var flickrRequestTimeout = setTimeout(function(){
-            flickrImg.parent().replaceWith("<div>Failed to load Flickr image!</div>");
+            flickrImg.parent().replaceWith('<div>Failed to load Flickr image!</div>');
         // 8 second timeout
         }, 8000);
 
-        $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?", 
+        $.getJSON('http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?', 
             {
                 tags: listItem.searchString,
-                tagmode: "any",
-                format: "json"
+                tagmode: 'any',
+                format: 'json'
             },
             function(data) {
                 // Use only the first item/image returned
-                flickrImg.attr("src", data.items[0].media.m);
-                flickrImg.parent().attr("href", data.items[0].media.m);
+                flickrImg.attr('src', data.items[0].media.m);
+                flickrImg.parent().attr('href', data.items[0].media.m);
 
                 // Prevent timeout above from overwriting if success
                 clearTimeout(flickrRequestTimeout);
+                // Reposition window
+                self.iWindow.open(self.map);
             }
         );
-    };
+    }
 
     // Makes all markers hidden, resets search input, and makes 
     // ONLY the selected marker visible
@@ -358,12 +382,12 @@ var ViewModel = function() {
         self.iWindow.close();
     };
     
-    // On instatiation of VeiwMoeld initialize
-    if (typeof google !== "undefined") {
+    // On instatiation of VeiwModel initialize
+    if (typeof google !== 'undefined') {
         google.maps.event.addDomListener(window, 'load', initialize);
     }
     else {
-        $('#map-canvas').append("<strong><br>Google Map CONNECTION FAILED. Check your internet connection.<br></strong>");
+        $('#map-canvas').append('<strong><br>Google Map CONNECTION FAILED. Check your internet connection.<br></strong>');
     }
 };
 

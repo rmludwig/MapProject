@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Rich's Neighborhood</title>
     <!-- Moved all CSS into index to marginally speed DOM creation, Could minify later -->
-    <!-- <link href="css/style.css" rel="stylesheet" type="text/css"></link> -->
+    <!-- <link href="css/style.css" rel="stylesheet"></link> -->
     <style>
         body {
             background-color: #EEEEEE;
@@ -48,14 +48,16 @@
             opacity: 0.7;
             position: fixed;
             bottom: 0;
-            left: 0;
-            margin-bottom: 50px;
+            right: 0;
+            margin-bottom: 15px;
             padding-top: 15px;
             width: 230px;
-            z-index: 10;
+            z-index: 1;
             font-size: 16px;
             font-weight: bold;
-            
+        }
+        .location-list-hide {
+            visibility: hidden;
         }
         .location-item, .location-item a, .all-visible a {
             color: #000000;
@@ -76,15 +78,31 @@
             padding-left: 15px;
         }
         .flickr-image {
-            max-width: 100px;
-            max-height: 100px;
+            height: 100px;
         }
         .flickr-link {
             text-decoration: none;
         }
+        .gm-style-iw {
+            margin-top: 30px;
+            /*overflow: hidden !important;*/
+            /*overflow-y: auto; */
+            max-height: 200;
+        }
+        .gm-style-iw:nth-child(2) {
+            margin-top: 0px;
+            /*overflow: hidden !important;*/
+            /*overflow-y: auto;*/
+        }
+        .gm-style-iw h2{
+            margin-top: 0px;
+            margin-bottom: 5px;
+            /*overflow: hidden !important;*/
+            overflow-y: auto;
+        }
+
     </style>
-    <script type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtooKMrbs_gvtGXsqx_1zTJNCoyYD8XtU">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCtooKMrbs_gvtGXsqx_1zTJNCoyYD8XtU">
     </script>
 </head>
 
